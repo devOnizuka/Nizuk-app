@@ -1,0 +1,491 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Inter:wght@400;500;600;700&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  /* NIZUK Dark Theme */
+  --bg:#0f1117;
+  --card:#171923;
+  --card2:#1f2430;
+  --border:#2d3348;
+  --accent:#3b82f6;
+  --accent-h:#60a5fa;
+  --ink:#e5e7eb;
+  --mid:#9ca3af;
+  --dim:#6b7280;
+  --correct:#22c55e;
+  --wrong:#ef4444;
+  --gold:#f59e0b;
+  --purple:#a855f7;
+  /* legado (usado em alguns lugares) */
+  --red:var(--accent);--red-l:var(--accent-h);
+  --cream:var(--bg);--cream-d:var(--border);
+  --blue:var(--accent);
+  --radius:12px;
+  --shadow:0 4px 24px rgba(0,0,0,0.4);
+  --font-jp:'Noto Sans JP',sans-serif;--font-ui:'Inter',system-ui,sans-serif;
+  --nav-h:62px;
+}
+html,body{height:100%;background:var(--bg);color:var(--ink);font-family:var(--font-ui);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;}
+
+.screen{display:none;min-height:100vh;flex-direction:column;padding-bottom:calc(var(--nav-h)+10px);}
+.screen.active{display:flex;}
+#screen-review,#screen-anki-review,#screen-detail,#screen-anki-deck{padding-bottom:var(--nav-h);}
+
+/* Fase 0.5 fix: quando feedback+SRS estão visíveis, compacta o card para tudo caber sem scroll */
+#screen-review.has-feedback .card-area{
+  min-height:unset;
+  padding:18px 22px 16px;
+  margin-bottom:8px;
+}
+#screen-review.has-feedback .question-main{font-size:3rem;}
+#screen-review.has-feedback .question-sub{font-size:1.1rem;margin-top:6px;}
+#screen-review.has-feedback .question-type{margin-bottom:6px;}
+#screen-review.has-feedback .feedback-box{margin-bottom:8px;}
+#screen-review.has-feedback .srs-buttons{padding-bottom:8px;}
+#screen-review.has-feedback .srs-btn{padding:9px 6px;}
+
+/* NAVBAR */
+.navbar{position:fixed;bottom:0;left:0;right:0;height:var(--nav-h);background:var(--card);border-top:1px solid var(--border);display:flex;align-items:stretch;z-index:100;box-shadow:0 -4px 20px rgba(0,0,0,0.3);}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:none;border:none;cursor:pointer;color:var(--dim);transition:color .18s;font-family:var(--font-ui);font-size:1.2rem;}
+.nav-btn span{font-size:.6rem;font-weight:600;}
+.nav-btn.active{color:var(--accent);}
+
+/* PAGE HEADER */
+.page-header{padding:16px 18px 10px;background:var(--card);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:9;}
+.page-header h2{font-size:1.1rem;font-weight:700;}
+
+/* DASHBOARD */
+.dash-header{background:var(--card);border-bottom:1px solid var(--border);color:var(--ink);padding:22px 20px 18px;display:flex;justify-content:space-between;align-items:center;}
+/* .logo-jp e .logo-en removidos — não utilizados no HTML nem no JS */
+.dash-streak{display:flex;align-items:center;gap:5px;background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:8px 14px;}
+.streak-fire{font-size:1.3rem;}
+#dash-streak-num{font-size:1.5rem;font-weight:700;color:#FFD700;}
+.streak-lbl{font-size:.72rem;color:var(--mid);}
+.dash-body{display:flex;flex-direction:column;gap:13px;padding:14px 16px 0;}
+
+.due-card{background:linear-gradient(135deg,#1e3a5f,#1a2d4a);border:1px solid #2d4a7a;border-radius:var(--radius);padding:18px 20px;display:flex;align-items:center;justify-content:space-between;box-shadow:var(--shadow);}
+.due-num{font-size:2.6rem;font-weight:700;color:#FFD700;}
+.due-lbl{font-size:.78rem;color:#93b4d4;margin-top:2px;}
+.btn-study-now{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:12px 18px;font-weight:700;font-size:.88rem;cursor:pointer;transition:background .15s,transform .12s;white-space:nowrap;}
+.btn-study-now:hover{background:var(--accent-h);transform:translateY(-1px);}
+.btn-study-now:disabled{background:var(--card2);color:var(--dim);cursor:not-allowed;}
+
+.section-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:15px;}
+.section-title{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--dim);font-weight:700;margin-bottom:11px;}
+
+.today-row{display:flex;gap:0;justify-content:space-around;flex-wrap:wrap;}
+.today-item{text-align:center;padding:4px 8px;}
+.today-num{font-size:1.4rem;font-weight:700;color:var(--ink);}
+.today-lbl{font-size:.68rem;color:var(--mid);}
+
+.shortcut-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+.shortcut-btn{background:var(--card2);color:var(--ink);border:1px solid var(--border);border-radius:11px;padding:18px 12px;font-family:var(--font-jp);font-size:1.5rem;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;transition:background .15s,border-color .15s,transform .12s;}
+.shortcut-btn span{font-family:var(--font-ui);font-size:.72rem;font-weight:600;color:var(--mid);}
+.shortcut-btn:hover,.shortcut-btn:active{background:var(--card2);border-color:var(--accent);color:var(--accent);transform:translateY(-2px);}
+.shortcut-btn.kanji-btn{border-color:#6366f1;color:#818cf8;}
+.shortcut-btn.vocab-btn{border-color:#a855f7;color:#c084fc;}
+.shortcut-btn.hira-btn{border-color:#0ea5e9;color:#38bdf8;}
+.shortcut-btn.kata-btn{border-color:#10b981;color:#34d399;}
+
+.quick-actions{display:flex;gap:9px;padding-bottom:4px;}
+.qa-btn{flex:1;background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:11px 8px;font-size:.8rem;font-weight:600;color:var(--mid);cursor:pointer;text-align:center;transition:border-color .15s,color .15s;}
+.qa-btn:hover{border-color:var(--accent);color:var(--accent);}
+
+/* BROWSE */
+.browse-tabs{display:flex;overflow-x:auto;background:var(--card);border-bottom:1px solid var(--border);}
+.tab-btn{flex-shrink:0;padding:10px 18px;background:none;border:none;font-size:.9rem;font-weight:600;color:var(--dim);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .15s,border-color .15s;font-family:var(--font-jp);}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent);}
+.browse-filters{display:flex;gap:8px;padding:11px 15px;background:var(--card);border-bottom:1px solid var(--border);}
+/* .filter-select removido — elemento não existe no HTML nem é criado por JS */
+.filter-search{flex:1;padding:8px 13px;border:1px solid var(--border);border-radius:9px;font-size:.83rem;background:var(--card2);color:var(--ink);outline:none;transition:border-color .15s;}
+.filter-search:focus{border-color:var(--accent);background:var(--card);}
+.browse-list{padding:11px 15px;display:flex;flex-direction:column;gap:6px;}
+.browse-item{background:var(--card);border-radius:10px;padding:11px 13px;display:flex;align-items:center;gap:11px;border:1px solid var(--border);cursor:pointer;transition:border-color .15s,background .15s;}
+.browse-item:hover{border-color:var(--accent);background:var(--card2);}
+.browse-char{font-family:var(--font-jp);font-size:1.6rem;min-width:34px;text-align:center;}
+.browse-info{flex:1;}
+.browse-reading{font-size:.8rem;color:var(--dim);font-family:var(--font-jp);}
+.browse-meaning{font-size:.86rem;font-weight:600;}
+.browse-jlpt{font-size:.65rem;font-weight:700;padding:2px 6px;border-radius:5px;background:var(--cream-d);color:var(--mid);}
+.browse-status{font-size:.9rem;}
+.add-section{padding:11px 15px 15px;}
+.btn-add-toggle{width:100%;padding:13px;background:var(--card2);border:1.5px dashed var(--border);border-radius:var(--radius);font-size:.9rem;font-weight:600;color:var(--dim);cursor:pointer;transition:border-color .15s,color .15s;}
+.btn-add-toggle:hover{border-color:var(--accent);color:var(--accent);}
+.add-form{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:13px;margin-top:9px;}
+.form-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:9px;}
+.form-input{flex:1;min-width:120px;padding:10px 11px;border:1px solid var(--border);border-radius:8px;font-size:.9rem;font-family:var(--font-jp);transition:border-color .15s;background:var(--card2);color:var(--ink);}
+.form-input:focus{outline:none;border-color:var(--accent);background:var(--card);}
+.btn-add{padding:11px 18px;background:var(--accent);color:#fff;border:none;border-radius:9px;font-weight:700;cursor:pointer;font-size:.9rem;transition:background .15s;}
+.btn-add:hover{background:var(--accent-h);}
+
+/* DETAIL */
+.detail-content{padding:18px 16px;display:flex;flex-direction:column;gap:13px;}
+.detail-hero{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:28px;text-align:center;}
+.detail-char{font-family:var(--font-jp);font-size:5rem;color:var(--ink);line-height:1;}
+.detail-reading{font-family:var(--font-jp);font-size:1.1rem;color:var(--mid);margin-top:6px;}
+.detail-meaning{font-size:1.1rem;font-weight:700;margin-top:6px;}
+.detail-jlpt{display:inline-block;font-size:.75rem;font-weight:700;padding:3px 10px;border-radius:7px;margin-top:8px;}
+.detail-section{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:15px;}
+.detail-section h3{font-size:.75rem;text-transform:uppercase;letter-spacing:.07em;color:var(--mid);font-weight:700;margin-bottom:10px;}
+.reading-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+.reading-box{background:var(--card2);border-radius:10px;padding:12px;text-align:center;}
+.reading-lbl{font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;color:var(--mid);font-weight:700;margin-bottom:3px;}
+.reading-val{font-family:var(--font-jp);font-size:1.15rem;font-weight:700;}
+.example-list{display:flex;flex-direction:column;gap:9px;}
+.example-item{border-left:3px solid var(--red);padding-left:10px;}
+.example-jp{font-family:var(--font-jp);font-size:1rem;font-weight:700;}
+.example-read{font-family:var(--font-jp);font-size:.82rem;color:var(--mid);}
+.example-pt{font-size:.82rem;color:var(--mid);}
+.srs-info{display:flex;gap:9px;flex-wrap:wrap;background:var(--card2);border-radius:10px;padding:11px;}
+.srs-info-item{flex:1;text-align:center;}
+.srs-info-num{font-size:1.15rem;font-weight:700;}
+.srs-info-lbl{font-size:.67rem;color:var(--mid);}
+.detail-actions{display:flex;gap:9px;}
+.btn-detail{flex:1;padding:12px;border:none;border-radius:var(--radius);font-weight:700;font-size:.88rem;cursor:pointer;transition:background .15s;}
+.btn-detail.primary{background:var(--accent);color:#fff;}
+.btn-detail.primary:hover{background:var(--accent-h);}
+.btn-detail.secondary{background:var(--card2);color:var(--ink);border:1px solid var(--border);}
+.btn-detail.secondary:hover{border-color:var(--accent);color:var(--accent);}
+
+/* REVIEW */
+.study-header{display:flex;align-items:center;gap:11px;padding:13px 15px 9px;background:var(--card);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:10;}
+.btn-icon{background:none;border:none;font-size:1.15rem;cursor:pointer;color:var(--dim);padding:4px 7px;border-radius:7px;transition:background .1s;}
+.btn-icon:hover{background:var(--card2);}
+.progress-bar-wrap{flex:1;height:7px;background:var(--border);border-radius:4px;overflow:hidden;}
+.progress-bar{height:100%;background:var(--accent);border-radius:4px;transition:width .35s ease;width:0%;}
+/* progress-label: contador n/total — aumentado de .77rem para .92rem */
+.progress-label{font-size:.92rem;font-weight:700;color:var(--mid);white-space:nowrap;}
+.score-row{display:flex;gap:10px;justify-content:center;align-items:center;padding:10px 18px 0;}
+/* score-chip: contadores acertos/erros — aumentado de .83rem para 1rem */
+.score-chip{display:flex;align-items:center;gap:5px;padding:6px 16px;border-radius:20px;font-size:1rem;font-weight:700;}
+.score-chip.correct{background:rgba(34,197,94,.12);color:var(--correct);}
+.score-chip.wrong{background:rgba(239,68,68,.12);color:var(--wrong);}
+.combo-badge{background:linear-gradient(135deg,var(--accent),var(--accent-h));color:#fff;font-weight:700;font-size:.88rem;padding:6px 14px;border-radius:20px;animation:comboPop .3s ease;}
+@keyframes comboPop{0%{transform:scale(.8)}60%{transform:scale(1.15)}100%{transform:scale(1)}}
+
+/* ── ÁREA DE QUESTÃO — tamanhos aumentados para melhor legibilidade ── */
+.card-area{background:var(--card);margin:14px 13px 10px;border-radius:18px;padding:36px 22px 32px;text-align:center;border:1px solid var(--border);min-height:200px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;}
+.question-type{font-size:.82rem;text-transform:uppercase;letter-spacing:.08em;color:var(--mid);margin-bottom:10px;font-weight:700;}
+/* question-main: aumentado — kanji/kana em modo reconhecer fica ~6rem via JS inline style */
+.question-main{font-family:var(--font-jp);font-size:4.5rem;color:var(--ink);line-height:1.1;}
+/* question-sub: leitura/furigana — aumentado de .9rem para 1.4rem */
+.question-sub{margin-top:10px;font-size:1.4rem;color:var(--mid);font-family:var(--font-jp);}
+.jlpt-badge{position:absolute;top:10px;right:13px;font-size:.7rem;font-weight:700;padding:3px 8px;border-radius:6px;background:var(--cream-d);color:var(--mid);}
+
+/* ── GRADE DE OPÇÕES — tamanhos aumentados para melhor clicabilidade ── */
+.options-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 13px 14px;}
+.option-btn{background:var(--card2);border:1.5px solid var(--border);border-radius:16px;padding:18px 10px;min-height:90px;font-family:var(--font-jp);font-size:1.15rem;cursor:pointer;transition:transform .12s,border-color .15s,background .15s,box-shadow .15s;color:var(--ink);font-weight:600;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.option-btn:hover:not(:disabled){transform:translateY(-2px);border-color:var(--accent);background:var(--card);box-shadow:0 4px 16px rgba(59,130,246,.15);}
+.option-btn.correct-ans{background:rgba(34,197,94,.15);border-color:var(--correct);color:var(--correct);}
+.option-btn.wrong-ans{background:rgba(239,68,68,.15);border-color:var(--wrong);color:var(--wrong);}
+.option-btn:disabled{cursor:not-allowed;transform:none;}
+
+.feedback-box{margin:0 13px 13px;background:var(--card);border-radius:var(--radius);padding:16px 18px;border-left:4px solid var(--border);animation:slideUp .2s ease;border:1px solid var(--border);}
+.feedback-box.is-correct{border-left-color:var(--correct);border-color:var(--border);}
+.feedback-box.is-wrong{border-left-color:var(--wrong);border-color:var(--border);}
+/* feedback-icon: aumentado de 1.15rem para 1.4rem */
+.feedback-icon{font-size:1.4rem;margin-bottom:5px;}
+/* feedback-correct: resposta correta — aumentado de .9rem para 1rem */
+.feedback-correct{font-weight:700;font-size:1rem;margin-bottom:4px;font-family:var(--font-jp);}
+/* feedback-exp: explicação — aumentado de .8rem para .9rem */
+.feedback-exp{font-size:.9rem;color:var(--mid);line-height:1.6;}
+/* feedback-next: próxima revisão — aumentado de .75rem para .85rem */
+.feedback-next{font-size:.85rem;color:var(--blue);margin-top:6px;font-style:italic;}
+
+/* .srs-buttons/.srs-btn bloco legado (tema claro) removido — definição canônica no dark theme está no bloco "srs buttons" abaixo */
+
+/* STATS */
+.stats-content{padding:15px;display:flex;flex-direction:column;gap:11px;}
+/* stat-card, stat-grid, dist-grid, dist-item: bloco legado (tema claro) removido — definições canônicas no dark theme em "stat cards no tema escuro" abaixo */
+
+/* ANKI */
+.anki-page-header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
+.anki-header-actions{display:flex;gap:8px;align-items:center;}
+/* .btn-anki-new-old-do-not-use e .btn-anki-import-old-do-not-use removidos — marcados obsoletos, vazios */
+/* hover states mantidos e realocados abaixo da definição principal (linhas 463-466) */
+
+.anki-deck-list{padding:13px 15px;display:flex;flex-direction:column;gap:10px;}
+/* .anki-deck-card-old-do-not-use removido — marcado obsoleto, vazio */
+.anki-deck-card:hover{border-color:var(--accent);transform:translateY(-2px);}
+.anki-deck-icon{font-size:1.8rem;min-width:36px;text-align:center;}
+.anki-deck-info{flex:1;}
+.anki-deck-name{font-weight:700;font-size:.95rem;margin-bottom:2px;}
+.anki-deck-desc{font-size:.78rem;color:var(--mid);}
+.anki-deck-meta{display:flex;gap:8px;margin-top:5px;flex-wrap:wrap;}
+.anki-badge{font-size:.7rem;font-weight:600;padding:2px 7px;border-radius:5px;}
+.anki-badge.due{background:rgba(239,68,68,.12);color:var(--wrong);}
+.anki-badge.total{background:var(--card2);color:var(--dim);}
+.anki-deck-arrow{color:var(--mid);font-size:.9rem;}
+.anki-empty{text-align:center;padding:40px 20px;color:var(--mid);}
+.anki-empty-icon{font-size:2.5rem;margin-bottom:8px;}
+.anki-empty-text{font-size:.88rem;}
+
+.anki-deck-body{display:flex;flex-direction:column;gap:0;}
+.anki-deck-stats{display:flex;gap:8px;padding:12px 15px;flex-wrap:wrap;}
+.anki-stat-chip{flex:1;min-width:70px;text-align:center;background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:10px 6px;}
+.anki-stat-num{font-size:1.4rem;font-weight:700;}
+.anki-stat-lbl{font-size:.68rem;color:var(--mid);}
+.anki-deck-actions{display:flex;gap:9px;padding:4px 15px 12px;}
+/* .btn-anki-study-old, .btn-anki-add-card-old, .anki-card-item-old removidos — marcados obsoletos, vazios */
+.btn-anki-study:hover{background:var(--accent-h);}
+.btn-anki-study:disabled{background:var(--card2);color:var(--dim);cursor:not-allowed;}
+.btn-anki-add-card:hover{border-color:var(--accent);}
+.anki-card-list{padding:0 15px 15px;display:flex;flex-direction:column;gap:6px;}
+/* .anki-card-front, .anki-card-back, .anki-card-del — definições canônicas na linha ~327 */
+
+/* ANKI REVIEW */
+.anki-card-flip{min-height:200px;flex-direction:column;gap:8px;}
+.anki-front-text{font-size:2.2rem;font-family:var(--font-jp);}
+.anki-hint-text{font-size:.85rem;color:var(--mid);}
+.anki-back{width:100%;}
+.anki-back-divider{width:60px;height:2px;background:var(--cream-d);margin:10px auto;}
+.anki-back-text{font-size:1.3rem;font-weight:700;color:var(--ink);font-family:var(--font-jp);text-align:center;}
+.btn-anki-reveal{margin-top:12px;background:var(--card2);color:var(--ink);border:1px solid var(--border);border-radius:10px;padding:12px 24px;font-weight:700;font-size:.9rem;cursor:pointer;transition:background .15s,border-color .15s;}
+.btn-anki-reveal:hover{background:var(--accent);border-color:var(--accent);color:#fff;}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:200;padding:20px;backdrop-filter:blur(2px);}
+.modal-box{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;width:100%;max-width:400px;box-shadow:0 8px 40px rgba(0,0,0,0.5);animation:slideUp .2s ease;}
+.modal-title{font-size:1.05rem;font-weight:700;margin-bottom:14px;}
+.modal-actions{display:flex;gap:9px;margin-top:4px;}
+.btn-primary{flex:1;background:var(--accent);color:#fff;border:none;border-radius:var(--radius);padding:13px;font-size:.9rem;font-weight:700;cursor:pointer;transition:background .15s;}
+.btn-primary:hover{background:var(--accent-h);}
+.btn-secondary{flex:1;background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:13px;font-size:.9rem;font-weight:600;color:var(--ink);cursor:pointer;transition:background .15s;}
+.btn-secondary:hover{background:var(--border);}
+
+/* EDIT BAR — bloco duplicado removido (definição canônica em "── EDIT BAR ──" abaixo) */
+/* EDIT FORM — bloco duplicado removido (definição canônica em "── EDIT FORM ──" abaixo) */
+/* .detail-edit-form-old-do-not-use removido — marcado obsoleto, vazio */
+
+.hidden{display:none !important;}
+@keyframes slideUp{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:translateY(0)}}
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+@media(max-width:480px){
+  /* Em telas pequenas: 1 coluna para as opções de resposta */
+  .options-jp{grid-template-columns:1fr;}
+  .options-text{grid-template-columns:1fr;}
+  .option-btn{min-height:70px;}
+  .opt-char{font-size:1.8rem;}
+  .srs-row{grid-template-columns:1fr 1fr;}
+  .anki-page-header{flex-direction:column;align-items:flex-start;}
+}
+@media(max-width:360px){
+  .question-main{font-size:3.5rem;}
+  .options-grid{grid-template-columns:1fr;}
+}
+
+/* ══ TELAS GRANDES (PC / tablet): centraliza o app num "quadro" ══
+   Evita que botões e grids estiquem de forma desproporcional quando
+   a tela é muito mais larga que o app foi desenhado para caber. */
+@media(min-width:640px){
+  html,body{background:#05060a;}
+  .screen{
+    max-width:480px;
+    margin:0 auto;
+    box-shadow:0 0 60px rgba(0,0,0,.55);
+    border-left:1px solid var(--border);
+    border-right:1px solid var(--border);
+    min-height:100vh;
+  }
+  .navbar{
+    left:50%;
+    right:auto;
+    transform:translateX(-50%);
+    width:100%;
+    max-width:480px;
+    box-shadow:0 -4px 24px rgba(0,0,0,.4), 1px 0 0 var(--border), -1px 0 0 var(--border);
+  }
+  .modal-overlay{padding:24px;}
+}
+
+/* ── ORIGIN BADGES ── */
+.origin-badge{display:inline-block;font-size:.65rem;font-weight:700;padding:2px 7px;border-radius:5px;letter-spacing:.04em;}
+.origin-badge.native{background:rgba(16,185,129,.12);color:#34d399;}
+.origin-badge.imported{background:rgba(59,130,246,.12);color:#60a5fa;}
+
+/* ── TAG BADGES ── */
+.tag-badge{display:inline-block;font-size:.65rem;padding:2px 6px;border-radius:5px;background:var(--card2);color:var(--dim);font-weight:600;}
+.browse-badges{display:flex;gap:4px;flex-wrap:wrap;margin-top:3px;}
+
+/* ── EDIT BAR ── */
+.detail-edit-bar{display:flex;gap:9px;padding:0 16px 6px;}
+.btn-edit-action{flex:1;padding:11px 8px;border:none;border-radius:var(--radius);font-weight:600;font-size:.85rem;cursor:pointer;transition:background .15s,transform .12s;}
+.btn-edit-action:active{transform:scale(.97);}
+.btn-edit-action.edit{background:rgba(59,130,246,.12);color:var(--accent);}
+.btn-edit-action.edit:hover{background:rgba(59,130,246,.2);}
+.btn-edit-action.remove{background:rgba(239,68,68,.1);color:var(--wrong);}
+.btn-edit-action.remove:hover{background:rgba(239,68,68,.2);}
+
+/* ── EDIT FORM ── */
+.detail-edit-form,.inline-card-edit{background:var(--card2);border:1px solid var(--border);margin:0 16px 12px;border-radius:var(--radius);padding:16px;border-left:3px solid var(--accent);animation:slideUp .2s ease;}
+.detail-edit-title{font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);margin-bottom:12px;}
+.edit-field-row{margin-bottom:9px;}
+.edit-field-label{display:block;font-size:.72rem;font-weight:600;color:var(--mid);margin-bottom:3px;text-transform:uppercase;letter-spacing:.05em;}
+.edit-field-input{width:100%;}
+.edit-form-actions{display:flex;gap:8px;margin-top:12px;}
+.btn-edit-cancel{flex:1;padding:11px;background:var(--card2);border:1px solid var(--border);border-radius:10px;font-weight:600;font-size:.88rem;color:var(--mid);cursor:pointer;transition:background .15s;}
+.btn-edit-cancel:hover{background:var(--border);}
+.btn-edit-save{flex:2;padding:11px;background:var(--accent);border:none;border-radius:10px;font-weight:700;font-size:.88rem;color:#fff;cursor:pointer;transition:background .15s;}
+.btn-edit-save:hover{background:var(--accent-h);}
+.edit-native-notice{font-size:.78rem;color:var(--gold);background:rgba(245,158,11,.1);border-radius:8px;padding:8px 10px;margin-top:6px;line-height:1.5;}
+
+/* inline card edit lives between card rows */
+.inline-card-edit{margin:0 15px 6px;border-left-color:var(--blue);}
+
+/* ── ANKI CARD LIST (with edit button) ── */
+.anki-card-item{background:var(--card);border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:8px;border:1px solid var(--border);}
+.anki-card-front{font-weight:700;font-size:.88rem;flex:1;}
+.anki-card-back{font-size:.82rem;color:var(--mid);flex:1;}
+.anki-card-lvl{font-size:.9rem;flex-shrink:0;}
+.anki-card-edit,.anki-card-del{background:none;border:none;cursor:pointer;font-size:.85rem;padding:4px 6px;border-radius:6px;transition:background .1s,color .1s;flex-shrink:0;}
+.anki-card-edit:hover{background:#EBF5FB;color:var(--blue);}
+.anki-card-del:hover{background:#FADBD8;color:var(--wrong);}
+
+/* ── ANKI DECK ACTIONS (4 buttons) ── */
+.anki-deck-actions{display:flex;gap:7px;padding:4px 15px 10px;flex-wrap:wrap;}
+.btn-anki-study{flex:3;background:var(--accent);color:#fff;border:none;border-radius:var(--radius);padding:13px;font-weight:700;font-size:.88rem;cursor:pointer;transition:background .15s;}
+.btn-anki-study:hover{background:var(--accent-h);}
+.btn-anki-study:disabled{background:var(--card2);color:var(--dim);cursor:not-allowed;}
+.btn-anki-add-card{flex:2;background:var(--card2);color:var(--ink);border:1px solid var(--border);border-radius:var(--radius);padding:13px;font-weight:600;font-size:.85rem;cursor:pointer;transition:border-color .15s;}
+.btn-anki-add-card:hover{border-color:var(--accent);}
+.btn-anki-rename{flex:1;background:rgba(59,130,246,.12);color:var(--accent);border:none;border-radius:var(--radius);padding:13px;font-size:1rem;cursor:pointer;transition:background .15s;}
+.btn-anki-rename:hover{background:rgba(59,130,246,.22);}
+.btn-anki-delete{flex:1;background:rgba(239,68,68,.1);color:var(--wrong);border:none;border-radius:var(--radius);padding:13px;font-size:1rem;cursor:pointer;transition:background .15s;}
+.btn-anki-delete:hover{background:rgba(239,68,68,.2);}
+
+/* .browse-filters-old-do-not-use, .filter-search-focus-old-do-not-use removidos — marcados obsoletos, vazios */
+/* .filter-search bloco legado (tema claro, background:var(--cream)) removido — definição canônica dark em linha 86 */
+
+/* ══ SELEÇÃO DE MODO ══ */
+.mode-select-body{padding:16px;display:flex;flex-direction:column;gap:14px;}
+.mode-select-hint{font-size:.82rem;color:var(--mid);font-weight:600;text-transform:uppercase;letter-spacing:.06em;padding:0 2px;}
+
+.mode-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:0;cursor:pointer;text-align:left;transition:border-color .15s,transform .15s;overflow:hidden;display:flex;flex-direction:column;}
+.mode-card:hover,.mode-card:active{border-color:var(--accent);transform:translateY(-2px);}
+
+.mode-card-demo{background:var(--card2);padding:16px 16px 12px;display:flex;flex-direction:column;align-items:center;gap:10px;}
+.mode-demo-question{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 20px;text-align:center;min-width:160px;}
+.mode-demo-text{font-size:1.15rem;font-weight:700;color:var(--ink);}
+.mode-demo-jp{font-family:var(--font-jp);font-size:1.8rem;font-weight:700;display:block;color:var(--ink);}
+.mode-demo-read{font-family:var(--font-jp);font-size:.9rem;color:var(--mid);display:block;margin-top:2px;}
+.mode-demo-arrow{font-size:1.1rem;color:var(--mid);}
+.mode-demo-options{display:grid;grid-template-columns:1fr 1fr;gap:6px;width:100%;}
+.mode-demo-opt{background:var(--card);border-radius:8px;padding:8px 6px;text-align:center;font-size:.78rem;color:var(--dim);border:1px solid var(--border);}
+.mode-demo-opt.active{border-color:var(--correct);color:var(--correct);font-weight:700;background:rgba(34,197,94,.12);}
+.mode-demo-opt.jp{font-family:var(--font-jp);font-size:.88rem;display:flex;flex-direction:column;gap:2px;}
+.mode-demo-opt.jp span{font-size:.68rem;color:var(--mid);font-family:var(--font-jp);}
+.mode-demo-opt.jp.active span{color:var(--correct);}
+
+.mode-card-info{padding:14px 16px 16px;display:flex;flex-direction:column;gap:4px;}
+.mode-card-icon{font-size:.75rem;font-weight:700;color:var(--mid);background:var(--cream-d);display:inline-block;padding:3px 9px;border-radius:6px;margin-bottom:3px;width:fit-content;}
+.mode-card-title{font-size:1rem;font-weight:700;color:var(--ink);}
+.mode-card-desc{font-size:.82rem;color:var(--mid);line-height:1.5;}
+
+.mode-session-info{text-align:center;font-size:.8rem;color:var(--dim);background:var(--card);border-radius:10px;padding:11px;border:1px solid var(--border);}
+
+/* ══ QUESTÃO LABEL ══ */
+.question-label{font-size:.92rem;color:var(--mid);margin-bottom:8px;font-weight:600;}
+
+/* ══ OPÇÕES COM JAPONÊS (modo encontrar) ══ */
+.options-jp{grid-template-columns:1fr 1fr;}
+.option-jp{display:flex;flex-direction:column;align-items:center;gap:6px;padding:16px 8px;}
+/* opt-char: kanji/kana nas opções — aumentado de 1.45rem para 2.2rem */
+.opt-char{font-family:var(--font-jp);font-size:2.2rem;font-weight:700;color:var(--ink);}
+/* opt-read: furigana nas opções — aumentado de .78rem para 1rem */
+.opt-read{font-family:var(--font-jp);font-size:1rem;color:var(--mid);}
+
+/* ══ OPÇÕES COM TEXTO (modo reconhecer) ══ */
+.options-text{grid-template-columns:1fr;}
+/* option-text: significados em português — aumentado de .92rem para 1.05rem */
+.option-text{font-size:1.05rem;text-align:left;padding:16px 20px;line-height:1.5;font-family:var(--font-ui);font-weight:500;}
+
+/* ══ TELA DE RESULTADO ══ */
+#screen-result{justify-content:center;align-items:center;min-height:100vh;padding-bottom:0;}
+.result-body{display:flex;flex-direction:column;align-items:center;gap:14px;padding:28px 20px;width:100%;max-width:420px;margin:0 auto;}
+.result-nota{font-size:1.3rem;font-weight:700;color:var(--ink);}
+.result-pct{font-size:4rem;font-weight:700;color:var(--ink);line-height:1;}
+.result-meta{font-size:.8rem;color:var(--mid);text-align:center;}
+.result-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;}
+.result-item{background:var(--card);border-radius:var(--radius);padding:16px 10px;text-align:center;border:1px solid var(--border);}
+.result-item.correct{border-color:rgba(34,197,94,.4);}
+.result-item.wrong{border-color:rgba(239,68,68,.4);}
+.result-num{font-size:2rem;font-weight:700;}
+.result-item.correct .result-num{color:var(--correct);}
+.result-item.wrong .result-num{color:var(--wrong);}
+.result-lbl{font-size:.72rem;color:var(--mid);margin-top:2px;}
+.result-actions{display:flex;flex-direction:column;gap:9px;width:100%;margin-top:4px;}
+.btn-result-repeat{padding:15px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius);font-weight:700;font-size:.95rem;cursor:pointer;transition:background .15s;}
+.btn-result-repeat:hover{background:var(--accent-h);}
+.btn-result-other{padding:14px;background:var(--card2);color:var(--ink);border:1px solid var(--border);border-radius:var(--radius);font-weight:600;font-size:.9rem;cursor:pointer;transition:border-color .15s;}
+.btn-result-other:hover{border-color:var(--accent);}
+.btn-result-home{padding:12px;background:transparent;color:var(--mid);border:none;border-radius:var(--radius);font-weight:600;font-size:.88rem;cursor:pointer;text-decoration:underline;}
+
+/* ══ BROWSE: GRUPO E FILTROS ══ */
+.browse-group-bar,.browse-filter-bar{display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.browse-group-bar::-webkit-scrollbar,.browse-filter-bar::-webkit-scrollbar{display:none;}
+.group-chip,.filter-chip{flex-shrink:0;padding:5px 13px;border:2px solid var(--cream-d);border-radius:20px;background:var(--card2);font-size:.78rem;font-weight:600;color:var(--dim);cursor:pointer;transition:border-color .12s,color .12s,background .12s;white-space:nowrap;}
+.group-chip.active,.filter-chip.active{border-color:var(--accent);color:var(--accent);background:rgba(59,130,246,.1);}
+.group-chip:hover,.filter-chip:hover{border-color:var(--accent);color:var(--accent);}
+
+/* ══ BOTÃO ADICIONAR MAIS VISÍVEL ══ */
+.btn-add-prominent{background:var(--accent) !important;color:#fff !important;border:none !important;border-radius:var(--radius) !important;font-size:.95rem !important;font-weight:700 !important;padding:15px !important;transition:background .15s !important;}
+.btn-add-prominent:hover{background:var(--accent-h) !important;border-color:transparent !important;}
+
+/* ══ CONTROLE DE VOLUME ══ */
+.volume-row{display:flex;gap:8px;}
+.vol-btn{flex:1;padding:10px 6px;border:1px solid var(--border);border-radius:10px;background:var(--card2);font-size:.82rem;font-weight:600;color:var(--dim);cursor:pointer;transition:border-color .12s,color .12s;}
+.vol-btn.active,.vol-btn:hover{border-color:var(--accent);color:var(--accent);}
+
+/* ══ NIZUK — Identidade Visual ══ */
+.logo-mark{
+  width:38px;height:38px;background:var(--accent);border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.3rem;font-weight:900;color:#fff;font-family:var(--font-ui);
+  letter-spacing:-.02em;flex-shrink:0;
+}
+.logo-name{
+  display:flex;flex-direction:column;
+}
+.logo-name{font-size:1.1rem;font-weight:800;color:var(--ink);letter-spacing:.04em;}
+.logo-sub{font-size:.6rem;color:var(--dim);font-weight:500;font-family:var(--font-jp);letter-spacing:.05em;margin-top:1px;}
+
+/* ══ NIZUK — Estilos gerais adicionais ══ */
+/* Selects (form inputs) */
+select.form-input{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%239ca3af'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center;padding-right:28px;}
+/* stat cards no tema escuro */
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:13px;}
+.stat-card h3{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--dim);font-weight:700;margin-bottom:12px;}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+.stat-item{background:var(--card2);border-radius:10px;padding:14px 10px;text-align:center;}
+.stat-item .num{font-size:1.6rem;font-weight:700;color:var(--ink);}
+.stat-item .lbl{font-size:.7rem;color:var(--dim);margin-top:2px;}
+.dist-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+.dist-item{background:var(--card2);border-radius:10px;padding:12px;text-align:center;}
+.dist-item .num{font-size:1.1rem;font-weight:700;color:var(--ink);}
+.dist-item .lbl{font-size:.68rem;color:var(--dim);margin-top:3px;}
+/* Anki empty */
+.anki-empty{text-align:center;padding:50px 20px;color:var(--dim);}
+.anki-empty-icon{font-size:2.5rem;margin-bottom:10px;}
+/* Anki page header */
+.anki-page-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+.anki-header-actions{display:flex;gap:8px;}
+.btn-anki-import{padding:9px 14px;background:var(--card2);color:var(--mid);border:1px solid var(--border);border-radius:9px;font-size:.82rem;font-weight:600;cursor:pointer;transition:border-color .15s,color .15s;}
+.btn-anki-import:hover{border-color:var(--accent);color:var(--accent);}
+.btn-anki-new{padding:9px 14px;background:var(--accent);color:#fff;border:none;border-radius:9px;font-size:.82rem;font-weight:700;cursor:pointer;transition:background .15s;}
+.btn-anki-new:hover{background:var(--accent-h);}
+/* srs buttons */
+.srs-buttons{padding:0 15px 15px;}
+.srs-label{font-size:.75rem;text-transform:uppercase;letter-spacing:.07em;color:var(--dim);font-weight:600;margin-bottom:8px;text-align:center;}
+.srs-row{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:7px;}
+.srs-btn{padding:12px 6px;border:1px solid var(--border);border-radius:10px;background:var(--card2);color:var(--ink);font-size:.72rem;font-weight:600;cursor:pointer;transition:border-color .15s,background .15s;line-height:1.5;text-align:center;}
+.srs-btn.q0{border-color:rgba(239,68,68,.3);color:var(--wrong);}
+.srs-btn.q0:hover{background:rgba(239,68,68,.1);}
+.srs-btn.q1{border-color:rgba(245,158,11,.3);color:var(--gold);}
+.srs-btn.q1:hover{background:rgba(245,158,11,.1);}
+.srs-btn.q2{border-color:rgba(59,130,246,.3);color:var(--accent);}
+.srs-btn.q2:hover{background:rgba(59,130,246,.1);}
+.srs-btn.q3{border-color:rgba(34,197,94,.3);color:var(--correct);}
+.srs-btn.q3:hover{background:rgba(34,197,94,.1);}
+/* Dash header com logo */
+.dash-header{gap:0;}
+.dash-header > div:first-child{display:flex;align-items:center;gap:10px;}

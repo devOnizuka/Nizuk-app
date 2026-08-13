@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NIZUK</title>
+  <link rel="stylesheet" href="css/main.css"/>
+</head>
+<body>
+
+<!-- ══ NAVBAR ══ -->
+<nav class="navbar" id="navbar">
+  <button class="nav-btn active" data-screen="home">🏠<span>Início</span></button>
+  <button class="nav-btn" data-screen="browse">📚<span>Conteúdo</span></button>
+  <button class="nav-btn" data-screen="stats">📊<span>Stats</span></button>
+  <button class="nav-btn" data-screen="anki">🃏<span>Anki</span></button>
+</nav>
+
+<!-- ══ INÍCIO ══ -->
+<div id="screen-home" class="screen active">
+  <header class="dash-header">
+    <div>
+      <div class="logo-mark">N</div>
+      <div class="logo-name">NIZUK<span class="logo-sub">日本語</span></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <button id="btn-account" class="dash-streak" style="cursor:pointer;border:1px solid var(--border);" title="Conta / Sincronização">
+        <span id="account-icon">👤</span>
+        <span id="account-label" class="streak-lbl">Conta</span>
+      </button>
+      <div class="dash-streak">
+        <span class="streak-fire">🔥</span>
+        <span id="dash-streak-num">0</span>
+        <span class="streak-lbl">dias</span>
+      </div>
+    </div>
+  </header>
+  <div class="dash-body">
+    <div class="section-card">
+      <div class="section-title">Estudar por categoria</div>
+      <div class="shortcut-grid">
+        <button class="shortcut-btn kanji-btn" data-cat="kanji">漢<span>Kanji</span></button>
+        <button class="shortcut-btn vocab-btn" data-cat="vocab">語<span>Vocab</span></button>
+        <button class="shortcut-btn hira-btn"  data-cat="hiragana">あ<span>Hiragana</span></button>
+        <button class="shortcut-btn kata-btn"  data-cat="katakana">ア<span>Katakana</span></button>
+      </div>
+    </div>
+    <div class="due-card">
+      <div>
+        <div class="due-num" id="due-count">0</div>
+        <div class="due-lbl">itens para revisar hoje</div>
+      </div>
+      <button class="btn-study-now" id="btn-study-now">Revisar agora →</button>
+    </div>
+    <div class="section-card">
+      <div class="section-title">Resumo do dia</div>
+      <div class="today-row">
+        <div class="today-item"><div class="today-num" id="today-time">0min</div><div class="today-lbl">estudado</div></div>
+        <div class="today-item"><div class="today-num" id="today-cards">0</div><div class="today-lbl">revisões</div></div>
+        <div class="today-item"><div class="today-num" id="today-right">0</div><div class="today-lbl">acertos</div></div>
+        <div class="today-item"><div class="today-num" id="today-wrong">0</div><div class="today-lbl">erros</div></div>
+        <div class="today-item"><div class="today-num" id="today-acc">—</div><div class="today-lbl">taxa</div></div>
+      </div>
+    </div>
+    <div class="quick-actions">
+      <button class="qa-btn" id="btn-export">💾 Exportar</button>
+      <label class="qa-btn">📂 Importar<input type="file" id="import-file" accept=".json" style="display:none"/></label>
+    </div>
+    <div class="section-card">
+      <div class="section-title">🔊 Volume das pronúncias</div>
+      <div class="volume-row">
+        <button class="vol-btn" data-vol="0.4">Baixo</button>
+        <button class="vol-btn" data-vol="0.7">Médio</button>
+        <button class="vol-btn" data-vol="1.0">Alto</button>
+      </div>
+      <div class="volume-row" style="margin-top:8px">
+        <button class="vol-btn" id="btn-mute-toggle">🔊 Som ligado</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SELEÇÃO DE MODO ══ -->
+<div id="screen-mode-select" class="screen">
+  <div class="study-header">
+    <button class="btn-icon" id="btn-back-mode">←</button>
+    <span style="font-size:.95rem;font-weight:700;flex:1">Escolher modo</span>
+    <span id="mode-cat-label" class="origin-badge imported"></span>
+  </div>
+
+  <div class="mode-select-body">
+    <p class="mode-select-hint">Escolha como deseja praticar:</p>
+
+    <!-- Modo 1: Encontrar a palavra -->
+    <button class="mode-card" id="btn-mode-encontrar">
+      <div class="mode-card-demo">
+        <div class="mode-demo-question">
+          <span class="mode-demo-text">indústria</span>
+        </div>
+        <div class="mode-demo-arrow">↓</div>
+        <div class="mode-demo-options">
+          <div class="mode-demo-opt jp active">産業<span>さんぎょう</span></div>
+          <div class="mode-demo-opt jp">趣味<span>しゅみ</span></div>
+          <div class="mode-demo-opt jp">日記<span>にっき</span></div>
+          <div class="mode-demo-opt jp">事務所<span>じむしょ</span></div>
+        </div>
+      </div>
+      <div class="mode-card-info">
+        <div class="mode-card-icon">Trad → 語</div>
+        <div class="mode-card-title">Encontrar a palavra</div>
+        <div class="mode-card-desc">Veja o significado em português e encontre a palavra japonesa correta.</div>
+      </div>
+    </button>
+
+    <!-- Modo 2: Reconhecer a palavra -->
+    <button class="mode-card" id="btn-mode-reconhecer">
+      <div class="mode-card-demo">
+        <div class="mode-demo-question">
+          <span class="mode-demo-jp">産業</span>
+          <span class="mode-demo-read">さんぎょう</span>
+        </div>
+        <div class="mode-demo-arrow">↓</div>
+        <div class="mode-demo-options">
+          <div class="mode-demo-opt text active">indústria</div>
+          <div class="mode-demo-opt text">hobby, preferência</div>
+          <div class="mode-demo-opt text">escritório</div>
+          <div class="mode-demo-opt text">diário</div>
+        </div>
+      </div>
+      <div class="mode-card-info">
+        <div class="mode-card-icon">語 → Trad</div>
+        <div class="mode-card-title">Reconhecer a palavra</div>
+        <div class="mode-card-desc">Veja a palavra japonesa e encontre o significado correto em português.</div>
+      </div>
+    </button>
+
+    <div class="mode-session-info">
+      <span>📋 Sessão de até <strong>40 questões</strong> — ordenadas pelo SRS</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══ REVISÃO ══ -->
+<div id="screen-review" class="screen">
+  <div class="study-header">
+    <button class="btn-icon" id="btn-back-review">←</button>
+    <div class="progress-bar-wrap"><div class="progress-bar" id="rev-pbar"></div></div>
+    <span class="progress-label" id="rev-plabel">0</span>
+  </div>
+  <div class="score-row">
+    <span class="score-chip correct" id="rev-correct">✓ 0</span>
+    <span class="combo-badge hidden" id="rev-combo">🔥 x2</span>
+    <span class="score-chip wrong"   id="rev-wrong">✗ 0</span>
+  </div>
+
+  <div class="card-area" id="rev-card">
+    <div class="question-type"  id="rev-qtype"></div>
+    <div class="question-label" id="rev-qlabel-sub"></div>
+    <div class="question-main"  id="rev-qmain"></div>
+    <div class="question-sub"   id="rev-qsub"></div>
+    <div class="jlpt-badge"     id="rev-jlpt"></div>
+  </div>
+
+  <div class="options-grid" id="rev-options"></div>
+
+  <div class="feedback-box hidden" id="rev-feedback">
+    <div class="feedback-icon"    id="rev-fb-icon"></div>
+    <div class="feedback-correct" id="rev-fb-ans"></div>
+    <div class="feedback-exp"     id="rev-fb-exp"></div>
+    <div class="feedback-next"    id="rev-fb-next"></div>
+    <div class="srs-buttons hidden" id="srs-btns">
+      <div class="srs-label">Como foi para você?</div>
+      <div class="srs-row">
+        <button class="srs-btn q0" data-q="0">😵<br>Não lembrei</button>
+        <button class="srs-btn q1" data-q="1">😓<br>Difícil</button>
+        <button class="srs-btn q2" data-q="3">😊<br>Lembrei</button>
+        <button class="srs-btn q3" data-q="5">🚀<br>Fácil</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ RESULTADO DA SESSÃO ══ -->
+<div id="screen-result" class="screen">
+  <div class="result-body">
+    <div class="result-nota" id="result-nota">🏆</div>
+    <div class="result-pct"  id="result-pct">0%</div>
+    <div class="result-meta">
+      <span id="result-cat"></span> · <span id="result-modo"></span>
+    </div>
+
+    <div class="result-grid">
+      <div class="result-item correct">
+        <div class="result-num" id="result-acertos">0</div>
+        <div class="result-lbl">Acertos</div>
+      </div>
+      <div class="result-item wrong">
+        <div class="result-num" id="result-erros">0</div>
+        <div class="result-lbl">Erros</div>
+      </div>
+      <div class="result-item">
+        <div class="result-num" id="result-total">0</div>
+        <div class="result-lbl">Total</div>
+      </div>
+      <div class="result-item">
+        <div class="result-num" id="result-mins">0</div>
+        <div class="result-lbl">Tempo</div>
+      </div>
+    </div>
+
+    <div class="result-actions">
+      <button class="btn-result-repeat" id="btn-result-repeat">🔁 Repetir mesmo modo</button>
+      <button class="btn-result-other"  id="btn-result-other">↔️ Trocar modo</button>
+      <button class="btn-result-home"   id="btn-result-home">🏠 Início</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CONTEÚDO ══ -->
+<div id="screen-browse" class="screen">
+  <div class="page-header"><h2>📚 Conteúdo</h2></div>
+  <div class="browse-tabs" id="browse-tabs">
+    <button class="tab-btn active" data-tab="kanji">漢字</button>
+    <button class="tab-btn" data-tab="vocab">語彙</button>
+    <button class="tab-btn" data-tab="hiragana">あ Hiragana</button>
+    <button class="tab-btn" data-tab="katakana">ア Katakana</button>
+  </div>
+  <!-- Grupos (baralhos importados) -->
+  <div class="browse-group-bar" id="browse-group-bar" style="display:none;overflow-x:auto;padding:8px 12px;gap:7px;background:#fff;border-bottom:1px solid var(--cream-d);"></div>
+  <!-- Filtros SRS -->
+  <div class="browse-filter-bar" id="browse-filter-bar" style="display:flex;overflow-x:auto;padding:6px 12px;gap:6px;background:#fff;border-bottom:1px solid var(--cream-d);"></div>
+  <div class="browse-filters">
+    <input type="text" id="filter-search" class="filter-search" placeholder="🔍 Buscar por caractere, leitura, significado ou tag…"/>
+  </div>
+  <div id="browse-list" class="browse-list"></div>
+  <div class="add-section">
+    <button class="btn-add-toggle btn-add-prominent" id="btn-add-toggle">＋ Adicionar item</button>
+    <div class="add-form hidden" id="add-form">
+      <div class="form-row" id="form-fields"></div>
+      <button class="btn-add" id="btn-save-item">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ DETALHE ══ -->
+<div id="screen-detail" class="screen">
+  <div class="study-header">
+    <button class="btn-icon" id="btn-back-detail">←</button>
+    <span id="detail-breadcrumb" style="font-size:.9rem;font-weight:600;color:var(--mid)"></span>
+  </div>
+  <div id="detail-content" class="detail-content"></div>
+</div>
+
+<!-- ══ STATS ══ -->
+<div id="screen-stats" class="screen">
+  <div class="page-header"><h2>📊 Estatísticas</h2></div>
+  <div id="stats-content" class="stats-content"></div>
+</div>
+
+<!-- ══ ANKI ══ -->
+<div id="screen-anki" class="screen">
+  <div class="page-header anki-page-header">
+    <h2>🃏 Anki</h2>
+    <div class="anki-header-actions">
+      <button class="btn-anki-import" id="btn-anki-import-deck">📥 Importar</button>
+      <input type="file" id="anki-import-file" accept=".json,.txt" style="display:none"/>
+      <button class="btn-anki-new" id="btn-anki-new-deck">＋ Novo Baralho</button>
+    </div>
+  </div>
+  <div id="anki-deck-list" class="anki-deck-list"></div>
+</div>
+
+<!-- ══ ANKI: DETALHE DO BARALHO ══ -->
+<div id="screen-anki-deck" class="screen">
+  <div class="study-header">
+    <button class="btn-icon" id="btn-back-anki-deck">←</button>
+    <span id="anki-deck-title" style="font-size:.95rem;font-weight:700;flex:1;"></span>
+    <span id="anki-deck-cat-badge" class="origin-badge imported" style="flex-shrink:0"></span>
+  </div>
+  <div class="anki-deck-body">
+    <div class="anki-deck-stats" id="anki-deck-stats"></div>
+    <div class="anki-deck-actions">
+      <button class="btn-anki-study"    id="btn-anki-study-deck">📖 Estudar</button>
+      <button class="btn-anki-add-card" id="btn-anki-add-card">＋ Card</button>
+      <button class="btn-anki-rename"   id="btn-anki-rename-deck">✏️</button>
+      <button class="btn-anki-delete"   id="btn-anki-delete-deck">🗑️</button>
+    </div>
+    <div class="add-form hidden" id="anki-rename-form" style="margin:0 15px 10px;">
+      <div class="detail-edit-title">✏️ Editar baralho</div>
+      <input class="form-input" id="rename-deck-name" placeholder="Nome" style="margin-bottom:6px"/>
+      <input class="form-input" id="rename-deck-desc" placeholder="Descrição" style="margin-bottom:6px"/>
+      <div class="edit-field-row">
+        <label class="edit-field-label">Categoria</label>
+        <select class="form-input" id="rename-deck-cat">
+          <option value="kanji">Kanji</option>
+          <option value="vocab">Vocabulário</option>
+          <option value="hiragana">Hiragana</option>
+          <option value="katakana">Katakana</option>
+        </select>
+      </div>
+      <div class="edit-form-actions">
+        <button class="btn-edit-cancel" id="btn-rename-cancel">Cancelar</button>
+        <button class="btn-edit-save"   id="btn-rename-save">Salvar</button>
+      </div>
+    </div>
+    <div class="add-form hidden" id="anki-add-card-form" style="margin:0 15px 10px;">
+      <div class="detail-edit-title">＋ Novo card</div>
+      <input class="form-input" id="anki-card-front"   placeholder="Frente (palavra / kanji)" style="margin-bottom:6px"/>
+      <input class="form-input" id="anki-card-back"    placeholder="Verso (significado)" style="margin-bottom:6px"/>
+      <input class="form-input" id="anki-card-hint"    placeholder="Leitura / dica (opcional)" style="margin-bottom:8px"/>
+      <button class="btn-add"   id="btn-anki-save-card">Salvar card</button>
+    </div>
+    <div class="section-title" style="padding:8px 15px 4px;">Cards</div>
+    <div id="anki-card-list" class="anki-card-list"></div>
+  </div>
+</div>
+
+<!-- ══ ANKI: REVISÃO ══ -->
+<div id="screen-anki-review" class="screen">
+  <div class="study-header">
+    <button class="btn-icon" id="btn-back-anki-review">←</button>
+    <div class="progress-bar-wrap"><div class="progress-bar" id="anki-rev-pbar"></div></div>
+    <span class="progress-label" id="anki-rev-plabel">0</span>
+  </div>
+  <div class="score-row">
+    <span class="score-chip correct" id="anki-rev-correct">✓ 0</span>
+    <span class="score-chip wrong"   id="anki-rev-wrong">✗ 0</span>
+  </div>
+  <div class="card-area anki-card-flip" id="anki-rev-card">
+    <div class="question-type"  id="anki-rev-qtype">Frente</div>
+    <div class="question-main anki-front-text" id="anki-rev-front"></div>
+    <div class="question-sub  anki-hint-text"  id="anki-rev-hint"></div>
+    <div class="anki-back hidden" id="anki-rev-back-wrap">
+      <div class="anki-back-divider"></div>
+      <div class="anki-back-text" id="anki-rev-back"></div>
+    </div>
+    <button class="btn-anki-reveal hidden" id="btn-anki-reveal">Revelar →</button>
+  </div>
+  <div class="srs-buttons hidden" id="anki-srs-btns" style="padding:0 15px 15px;">
+    <div class="srs-label">Como foi?</div>
+    <div class="srs-row">
+      <button class="srs-btn q0" data-q="0">😵<br>Não lembrei</button>
+      <button class="srs-btn q1" data-q="1">😓<br>Difícil</button>
+      <button class="srs-btn q2" data-q="3">😊<br>Lembrei</button>
+      <button class="srs-btn q3" data-q="5">🚀<br>Fácil</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: NOVO BARALHO ══ -->
+<div class="modal-overlay hidden" id="modal-new-deck">
+  <div class="modal-box">
+    <h3 class="modal-title">Novo Baralho</h3>
+    <input class="form-input" id="new-deck-name" placeholder="Nome do baralho" style="margin-bottom:6px"/>
+    <input class="form-input" id="new-deck-desc" placeholder="Descrição (opcional)" style="margin-bottom:8px"/>
+    <div class="edit-field-row">
+      <label class="edit-field-label">Categoria no Conteúdo</label>
+      <select class="form-input" id="new-deck-cat">
+        <option value="vocab">Vocabulário</option>
+        <option value="kanji">Kanji</option>
+        <option value="hiragana">Hiragana</option>
+        <option value="katakana">Katakana</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" id="btn-cancel-deck">Cancelar</button>
+      <button class="btn-primary"   id="btn-confirm-deck">Criar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: CATEGORIA NA IMPORTAÇÃO ══ -->
+<div class="modal-overlay hidden" id="modal-import-cat">
+  <div class="modal-box">
+    <h3 class="modal-title">📥 Importar Baralho</h3>
+    <p style="font-size:.85rem;color:var(--mid);margin-bottom:12px">
+      Baralho: <strong id="import-cat-deck-name"></strong>
+    </p>
+    <div class="edit-field-row">
+      <label class="edit-field-label">Onde os cards devem aparecer?</label>
+      <select class="form-input" id="import-cat-select">
+        <option value="vocab">Vocabulário</option>
+        <option value="kanji">Kanji</option>
+        <option value="hiragana">Hiragana</option>
+        <option value="katakana">Katakana</option>
+      </select>
+    </div>
+    <p style="font-size:.78rem;color:var(--mid);margin-top:6px;line-height:1.5">
+      Os cards aparecerão na aba Conteúdo e usarão o mesmo sistema SRS.
+    </p>
+    <div class="modal-actions" style="margin-top:14px">
+      <button class="btn-secondary" id="btn-cancel-import-cat">Cancelar</button>
+      <button class="btn-primary"   id="btn-confirm-import-cat">Importar</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/data/hiragana.js"></script>
+<script src="js/data/katakana.js"></script>
+<script src="js/data/vocab.js"></script>
+<script src="js/data/kanji.js"></script>
+<script src="js/engine/storage.js"></script>
+<script src="js/engine/fsrs.js"></script>
+<script src="js/ui/dashboard.js"></script>
+<script src="js/ui/browse.js"></script>
+<script src="js/ui/review.js"></script>
+<script src="js/ui/stats.js"></script>
+<script src="js/ui/anki.js"></script>
+<!-- ══ MODAL: CONTA / SINCRONIZAÇÃO ══ -->
+<div class="modal-overlay hidden" id="modal-account">
+  <div class="modal-box">
+    <h3 class="modal-title">☁️ Conta e Sincronização</h3>
+
+    <!-- Estado: deslogado -->
+    <div id="account-logged-out">
+      <p style="font-size:.82rem;color:var(--mid);margin-bottom:12px;line-height:1.5">
+        Entre com email e senha para sincronizar seu progresso entre PC e tablet automaticamente.
+      </p>
+      <input class="form-input" id="account-email" type="email" placeholder="Email" style="margin-bottom:8px;font-family:var(--font-ui)"/>
+      <input class="form-input" id="account-password" type="password" placeholder="Senha (mín. 6 caracteres)" style="margin-bottom:6px;font-family:var(--font-ui)"/>
+      <p id="account-error" class="hidden" style="font-size:.78rem;color:var(--wrong);margin-bottom:8px"></p>
+      <div class="modal-actions">
+        <button class="btn-secondary" id="btn-account-signup">Criar conta</button>
+        <button class="btn-primary"   id="btn-account-signin">Entrar</button>
+      </div>
+    </div>
+
+    <!-- Estado: logado -->
+    <div id="account-logged-in" class="hidden">
+      <p style="font-size:.85rem;margin-bottom:4px">Conectado como:</p>
+      <p style="font-size:.95rem;font-weight:700;margin-bottom:12px" id="account-current-email"></p>
+      <p id="account-sync-status" style="font-size:.8rem;color:var(--mid);margin-bottom:14px">—</p>
+      <div class="modal-actions">
+        <button class="btn-secondary" id="btn-account-logout">Sair</button>
+        <button class="btn-primary"   id="btn-account-sync-now">Sincronizar agora</button>
+      </div>
+    </div>
+
+    <div class="modal-actions" style="margin-top:10px">
+      <button class="btn-secondary" id="btn-account-close" style="width:100%">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/app.js"></script>
+<script type="module" src="js/engine/firebase-sync.js"></script>
+</body>
+</html>
