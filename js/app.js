@@ -113,7 +113,7 @@ const App = (() => {
     const currentEmailEl = document.getElementById('account-current-email');
     const iconEl        = document.getElementById('account-icon');
 
-    function openModal()  { modal.classList.remove('hidden'); errorEl.classList.add('hidden'); }
+    function openModal()  { modal.classList.remove('hidden'); errorEl.classList.add('hidden'); document.getElementById('account-reset-msg').classList.add('hidden'); }
     function closeModal() { modal.classList.add('hidden'); }
     function showError(msg) { errorEl.textContent = msg; errorEl.classList.remove('hidden'); }
 
@@ -134,6 +134,20 @@ const App = (() => {
       const r = await window.NizukSync.signUp(emailEl.value.trim(), passEl.value);
       if (!r.ok) return showError(r.message);
       refreshView();
+    });
+
+    document.getElementById('btn-account-forgot').addEventListener('click', async (e) => {
+      e.preventDefault();
+      errorEl.classList.add('hidden');
+      const resetMsgEl = document.getElementById('account-reset-msg');
+      resetMsgEl.classList.add('hidden');
+      const email = emailEl.value.trim();
+      if (!email) return showError('Digite seu email no campo acima e clique em "Esqueci minha senha" de novo.');
+      if (!window.NizukSync) return showError('Sincronização ainda carregando, tente em instantes.');
+      const r = await window.NizukSync.resetPassword(email);
+      if (!r.ok) return showError(r.message);
+      resetMsgEl.textContent = '✅ Enviamos um link para redefinir sua senha em ' + email + '. Confira sua caixa de entrada (e o spam).';
+      resetMsgEl.classList.remove('hidden');
     });
 
     document.getElementById('btn-account-signin').addEventListener('click', async () => {
