@@ -280,7 +280,7 @@ html,body{height:100%;background:var(--bg);color:var(--ink);font-family:var(--fo
 @media(min-width:640px){
   html,body{background:#05060a;}
   .screen{
-    max-width:clamp(480px, 65vw, 900px);
+    max-width:min(1400px, 96vw);
     margin:0 auto;
     box-shadow:0 0 60px rgba(0,0,0,.55);
     border-left:1px solid var(--border);
@@ -292,10 +292,16 @@ html,body{height:100%;background:var(--bg);color:var(--ink);font-family:var(--fo
     right:auto;
     transform:translateX(-50%);
     width:100%;
-    max-width:clamp(480px, 65vw, 900px);
+    max-width:min(1400px, 96vw);
     box-shadow:0 -4px 24px rgba(0,0,0,.4), 1px 0 0 var(--border), -1px 0 0 var(--border);
   }
   .modal-overlay{padding:24px;}
+}
+
+/* ══ TELAS BEM LARGAS: categorias e opções aproveitam o espaço extra ══ */
+@media(min-width:900px){
+  .shortcut-grid{grid-template-columns:repeat(4,1fr);}
+  .options-jp,.options-text{grid-template-columns:repeat(4,1fr);}
 }
 
 /* ── ORIGIN BADGES ── */
