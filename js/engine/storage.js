@@ -541,3 +541,11 @@ const Storage = {
     return this.restore(d);
   },
 };
+
+// Fase 0.7 — Expõe explicitamente em window.Storage.
+// Necessário porque firebase-sync.js é um <script type="module"> e não enxerga
+// o `const Storage` deste script clássico; sem esta linha, window.Storage cai
+// no objeto Storage embutido do navegador (usado por localStorage/sessionStorage),
+// que não tem os métodos snapshot()/restore() etc, causando falha silenciosa
+// na sincronização ("window.Storage.snapshot is not a function").
+window.Storage = Storage;
