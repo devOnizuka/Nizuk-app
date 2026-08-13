@@ -6,7 +6,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
 import {
   getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
-  signOut, onAuthStateChanged,
+  signOut, onAuthStateChanged, sendPasswordResetEmail,
 } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
 import {
   getFirestore, doc, getDoc, setDoc, serverTimestamp,
@@ -141,6 +141,14 @@ window.NizukSync = {
   async signIn(email, password) {
     try {
       await signInWithEmailAndPassword(auth, email, password);
+      return { ok: true };
+    } catch (e) {
+      return { ok: false, error: e.code, message: _traduzErro(e.code) };
+    }
+  },
+  async resetPassword(email) {
+    try {
+      await sendPasswordResetEmail(auth, email);
       return { ok: true };
     } catch (e) {
       return { ok: false, error: e.code, message: _traduzErro(e.code) };
